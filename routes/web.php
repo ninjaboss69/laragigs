@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\ListingController;
+use App\Models\Listing; 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
-use App\Models\Listing; 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ListingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,7 +22,11 @@ Route::get('/',[ListingController::class,'index']);
 
 // Show create form
 
-Route::get("/listings/create",[ListingController::class,'create']);
+Route::get("/listings/create",[ListingController::class,'create'])->middleware('auth');
+
+//Manage Listing
+
+Route::get('/listings/manage',[ListingController::class,'manage'])->middleware('auth');
 
 //A single Listing
 
@@ -33,12 +38,41 @@ Route::post("/listings",[ListingController::class,'store']);
 
 //Show Edit Form
 
-Route::get('listings/{listing}/edit',[ListingController::class,'edit']);
+Route::get('listings/{listing}/edit',[ListingController::class,'edit'])->middleware('auth');
 
 
 //Edit Submite To Update
 
-Route::put("listings/{listing}",[ListingController::class,'update']);
+Route::put("listings/{listing}",[ListingController::class,'update'])->middleware('auth');
+
+//Delete
+
+Route::delete("listings/{listing}",[ListingController::class,'delete'])->middleware('auth');
+
+//Show Register From
+
+Route::get("/register",[UserController::class,'create'])->middleware('guest');
+
+
+//Create New User
+
+Route::post('/users',[UserController::class,'store']);
+
+
+//Log User Out
+
+Route::post('/logout',[UserController::class,'logout'])->middleware('auth');
+
+//Show Login Form
+
+Route::get("/login",[UserController::class,'show'])->name('login')->middleware('auth') ;
+
+//Login User
+
+Route::post('user/login',[UserController::class,'login']);
+
+
+
 
 
 

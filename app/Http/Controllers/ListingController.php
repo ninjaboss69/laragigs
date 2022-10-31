@@ -41,9 +41,8 @@ class ListingController extends Controller
        ]);
        if($request->hasFile('logo')){
          $formFileds['logo']=$request->file('logo')->store('logos','public');
-       }else{ 
-         dd($request);
        }
+       $formFileds['user_id']=auth()->id();
        Listing::create($formFileds);
        //Session::flash('message','listing created');
        return redirect('/')->with('message','Listing Created successfully!');
@@ -55,7 +54,12 @@ class ListingController extends Controller
     }
 
     public function update(Request $request,Listing $listing){
-      //dd($request->file('logo')->store());
+      
+      //Make sure login user is owner
+
+      if($listing->user_id != auth()->id()){
+        abort(403,'Unauthorized Action! If you think this is mistake, contact to Admin Team');
+      }
         $formFileds = $request->validate([
          'title' => 'required',
          'company' => ['required'],
@@ -72,6 +76,19 @@ class ListingController extends Controller
        // Listing::create($formFileds);
         //Session::flash('message','listing created');
         return back()->with('message','Listing updated successfully!');
+     }
+
+     public function delete(Listing $listing){
+      if($listing->user_id != auth()->id()){
+        abort(403,'Unauthorized Action! If you think this is mistake, contact to Admin Team');
+      }
+      $listing->delete();
+      return redirect('/')->with("message","Listing deleted successfully");
+     }
+     
+
+     public function manage(){
+        return view('listings.manage',['listings'=>auth()->user()->listings()->get()]);
      }
 
 } 
